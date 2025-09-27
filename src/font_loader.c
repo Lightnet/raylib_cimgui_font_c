@@ -1,4 +1,8 @@
-// due to conflict with the cimgui stb_truetype it has be sandboxed to use font
+//===============================================
+// use of rlgl and font stb_truetype lib
+//===============================================
+// due to conflict with the cimgui stb_truetype it has be sandboxed or isolated to use font lib.
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 #include "font_loader.h"
@@ -121,6 +125,7 @@ void DrawCustomText(CustomFont font, const char *text, float posX, float posY, u
 
 
 /*
+// this face wrong default on default render 2d
 void DrawCustomText(CustomFont font, const char *text, float posX, float posY, unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
     stbtt_packedchar* glyphs = (stbtt_packedchar*)font.glyphs;
 

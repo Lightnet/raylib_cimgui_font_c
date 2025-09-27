@@ -135,13 +135,13 @@ set(APP_NAME ril)
 
 add_executable(${APP_NAME}
 
-    # src/rlgl_2d.c
-    # src/rlgl_2d_gl_cw.c
+    # src/rlgl_2d.c             # main entry
+    # src/rlgl_2d_gl_cw.c       # main entry
 
     # requred sandbox truetype font which conflict with imgui
-    src/font_loader.c
-    # src/rlgl_font.c
-    src/rlgl_cimgui_font.c
+    src/font_loader.c           # sandbox font load
+    # src/rlgl_font.c           # main entry
+    src/rlgl_cimgui_font.c      # main entry
 )
 
 # Link application with custom_cimgui
@@ -185,3 +185,20 @@ if(WIN32)
         -static           # Avoid full static linking to prevent issues with system libraries
     )
 endif()
+
+
+# Define the source and destination directories
+set(RESOURCE_SRC_DIR "${CMAKE_SOURCE_DIR}/resources")
+set(RESOURCE_DEST_DIR "${CMAKE_BINARY_DIR}/resources")
+
+# Create the resources directory in the build folder
+file(MAKE_DIRECTORY ${RESOURCE_DEST_DIR})
+
+# Copy the resources folder to the build directory
+file(COPY ${RESOURCE_SRC_DIR} DESTINATION ${CMAKE_BINARY_DIR})
+
+# Optional: Add a custom target to ensure copying happens during build
+add_custom_target(copy_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCE_SRC_DIR} ${RESOURCE_DEST_DIR}
+    COMMENT "Copying resources to build directory"
+)

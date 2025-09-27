@@ -1,4 +1,8 @@
-// due to conflict with the cimgui stb_truetype it has be sandboxed to use font
+//===============================================
+// use of rlgl and font stb_truetype lib
+//===============================================
+// due to conflict with the cimgui stb_truetype it has be sandboxed or isolated to use font lib.
+
 #ifndef FONT_LOADER_H
 #define FONT_LOADER_H
 

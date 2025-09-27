@@ -1,21 +1,8 @@
 //===============================================
-// Base simple setup test for raylib and cimgui.
-// single file test
+// Sample setup for raylib and font. To make sure the font is load correctly.
+// Due to conflict with cimgui stb_truetype which been modified.
+// Using the header to isolated other libs to avoid conflict.
 //===============================================
-// #ifndef STB_RECT_PACK_IMPLEMENTATION
-// #define STB_RECT_PACK_IMPLEMENTATION
-// #include "stb_rect_pack.h"
-// #endif
-
-// #ifndef STB_TRUETYPE_IMPLEMENTATION
-// #define STB_TRUETYPE_IMPLEMENTATION
-// #include "stb_truetype.h"
-// #endif
-
-// #include "stb_rect_pack.h"
-
-// #include "imstb_rectpack.h"  // Provides stbrp_* declarations // from imgui
-// #include "imstb_truetype.h"  // Provides stbtt_* declarations (packing uses stbrp_*) // imgui
 
 #include "cimgui.h"
 #include "cimgui_impl.h"
@@ -109,7 +96,7 @@ int main() {
 
     // Load custom font
     // CustomFont font = LoadCustomFont("Kenney Pixel.ttf", 12.0f);  // Replace with actual font path
-    CustomFont font = LoadCustomFont("Kenney Pixel.ttf", 18.0f);  // Replace with actual font path
+    CustomFont font = LoadCustomFont("resources/Kenney Pixel.ttf", 18.0f);  // Replace with actual font path
 
     if (font.textureId == 0) {
         printf("Error: Font failed to load properly\n");
