@@ -128,7 +128,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 
-
 #================================================
 # Application
 #================================================
@@ -138,9 +137,11 @@ add_executable(${APP_NAME}
 
     # src/rlgl_2d.c
     # src/rlgl_2d_gl_cw.c
+
+    # requred sandbox truetype font which conflict with imgui
     src/font_loader.c
-    # src/rlgl_cimgui_standalone.c
-    src/rlgl_font.c
+    # src/rlgl_font.c
+    src/rlgl_cimgui_font.c
 )
 
 # Link application with custom_cimgui

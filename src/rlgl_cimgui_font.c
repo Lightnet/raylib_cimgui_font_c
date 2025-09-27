@@ -111,6 +111,11 @@ int main() {
     // CustomFont font = LoadCustomFont("Kenney Pixel.ttf", 12.0f);  // Replace with actual font path
     CustomFont font = LoadCustomFont("Kenney Pixel.ttf", 18.0f);  // Replace with actual font path
 
+    if (font.textureId == 0) {
+        printf("Error: Font failed to load properly\n");
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+
     // Setup ImGui
     igCreateContext(NULL);
     ImGuiIO *ioptr = igGetIO();
@@ -147,89 +152,94 @@ int main() {
         // Clear early (color + depth for 3D)
         rlClearScreenBuffers();
 
-        // // ImGui frame start
-        // ImGui_ImplOpenGL3_NewFrame();
-        // ImGui_ImplGlfw_NewFrame();
-        // igNewFrame();
+        // ImGui frame start
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        igNewFrame();
 
-        // // Build ImGui UI
-        // igBegin("Hello, world!", NULL, 0);
-        // igText("This is some useful text.");
-        // igText("3D Cube should now rotate below!");
-        // igText("Current Rotation: %.1f degrees", rotation);
-        // if (igSliderFloat("Cube Y Rotation", &rotation, 0.0f, 360.0f, "%.0f degrees", 0)) {
-        //     // Slider changed - rotation updates immediately
-        // }
-        // igEnd();
-        // // End ImGui frame (record lists)
-        // igRender();
+        // Build ImGui UI
+        igBegin("Hello, world!", NULL, 0);
+        igText("This is some useful text.");
+        igText("3D Cube should now rotate below!");
+        igText("Current Rotation: %.1f degrees", rotation);
+        if (igSliderFloat("Cube Y Rotation", &rotation, 0.0f, 360.0f, "%.0f degrees", 0)) {
+            // Slider changed - rotation updates immediately
+        }
+        igEnd();
+        // End ImGui frame (record lists)
+        igRender();
 
-        // // Enable depth test for 3D
-        // rlEnableDepthTest();
-        // // 3D Rendering Setup
-        // float aspect = (float)screenWidth / (float)screenHeight;
-        // Matrix proj = MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.1f, 1000.0f);  // Perspective projection
-        // rlSetMatrixProjection(proj);
+        // Enable depth test for 3D
+        rlEnableDepthTest();
+        // 3D Rendering Setup
+        float aspect = (float)screenWidth / (float)screenHeight;
+        Matrix proj = MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.1f, 1000.0f);  // Perspective projection
+        rlSetMatrixProjection(proj);
 
-        // // Compute view matrix from camera
-        // Matrix view = MatrixLookAt(camera.position, camera.target, camera.up);
+        // Compute view matrix from camera
+        Matrix view = MatrixLookAt(camera.position, camera.target, camera.up);
 
-        // // Compute model matrix: rotation * translation
-        // Matrix rot = MatrixRotateY(rotation * DEG2RAD);  // Rotate around Y
-        // Matrix trans = MatrixTranslate(cubePosition.x, cubePosition.y, cubePosition.z);
-        // Matrix model = MatrixMultiply(rot, trans);
+        // Compute model matrix: rotation * translation
+        Matrix rot = MatrixRotateY(rotation * DEG2RAD);  // Rotate around Y
+        Matrix trans = MatrixTranslate(cubePosition.x, cubePosition.y, cubePosition.z);
+        Matrix model = MatrixMultiply(rot, trans);
 
-        // // Full model-view matrix (apply model to view)
-        // Matrix modelView = MatrixMultiply(model, view);
+        // Full model-view matrix (apply model to view)
+        Matrix modelView = MatrixMultiply(model, view);
 
-        // // Set the full model-view directly (bypass stack)
-        // rlSetMatrixModelview(modelView);
+        // Set the full model-view directly (bypass stack)
+        rlSetMatrixModelview(modelView);
 
         // // Draw the cube (no push/pop or mult needed)
         // // CustomDrawCube((Vector3){0.0f, 0.0f, 0.0f});  // At local origin, with model applied above
-        // DrawCube((Vector3){0.0f, 0.0f, 0.0f}, 1.0f, 1.0f, 1.0f, GRAY);
+        DrawCube((Vector3){0.0f, 0.0f, 0.0f}, 1.0f, 1.0f, 1.0f, GRAY);
 
-        // rlDrawRenderBatchActive();  // Flush the batch
+        rlDrawRenderBatchActive();  // Flush the batch
 
-        rlDisableDepthTest();// 2d 
-        rlDisableBackfaceCulling();
-        // Ensure blending is enabled for solid colors (matches raylib's default 2D behavior)
-        rlEnableColorBlend();
+        // 2D rendering setup
+        rlDisableDepthTest();  // Disable depth test for 2D
+        // rlDisableBackfaceCulling();
+        glEnable(GL_BLEND);  // Enable blending (already done in your code)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Set projection matrix to ortho (2D screen space: top-left origin)
-        Matrix proj = MatrixOrtho(0.0f, (float)screenWidth, (float)screenHeight, 0.0f, -1.0f, 1.0f);
-        rlSetMatrixProjection(proj);
+        // Set orthographic projection
+        Matrix proj2 = MatrixOrtho(0.0f, (float)screenWidth, (float)screenHeight, 0.0f, -1.0f, 1.0f);
+        rlSetMatrixProjection(proj2);  // Allowed since it's in the main loop, not font rendering
 
-        // Set modelview to identity for direct screen-space drawing
-        // (or compute custom transformations here if needed, e.g., translate/scale)
-        Matrix modelView = MatrixIdentity();
-        rlSetMatrixModelview(modelView);
+        // Set identity modelview
+        Matrix modelView2 = MatrixIdentity();
+        rlSetMatrixModelview(modelView2);  // Allowed since it's in the main loop
 
-        // Ensure no texture is bound (solid color quad)
-        // rlSetTexture(0);
+        // Draw quad // vertex winding order not working due camera y
+        // rlBegin(RL_QUADS);
+        //     rlColor4ub(255, 0, 0, 255);  // Red color
+        //     rlVertex2f(100.0f, 100.0f);  // Top-left
+        //     rlVertex2f(300.0f, 100.0f);  // Top-right
+        //     rlVertex2f(300.0f, 200.0f);  // Bottom-right
+        //     rlVertex2f(100.0f, 200.0f);  // Bottom-left
+        // rlEnd();
 
-        // // Now draw your 2D content (example: a simple quad/rectangle at position (100, 100) with size 200x100)
-        rlBegin(RL_QUADS);
+        rlBegin(RL_QUADS);  // vertex winding order working due camera y
             rlColor4ub(255, 0, 0, 255);  // Red color
             rlVertex2f(100.0f, 100.0f);  // Top-left
-            rlVertex2f(300.0f, 100.0f);  // Top-right
-            rlVertex2f(300.0f, 200.0f);  // Bottom-right
             rlVertex2f(100.0f, 200.0f);  // Bottom-left
+            rlVertex2f(300.0f, 200.0f);  // Bottom-right
+            rlVertex2f(300.0f, 100.0f);  // Top-right
         rlEnd();
 
 
         // Draw custom text
-        DrawCustomText(font, "Custom Font Test", 10.0f, 10.0f, 255, 255, 255, 255);
+        // DrawCustomText(font, "Custom Font Test", 10.0f, 10.0f, 100, 100, 100, 100);
+        DrawCustomText(font, "Custom Font Test", 100.0f, 100.0f, 255, 0, 255, 255);  // Solid white
 
         rlDrawRenderBatchActive();  // Flush the batch
-        rlDisableColorBlend();  // Disable blending if not needed for 3D
+        rlDisableColorBlend();  // Disable blending
 
         // Reset state for ImGui
         // glUseProgram(0);
 
         // Render ImGui (on top, 2D)
-        // ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
+        ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
 
         glfwSwapBuffers(window);
     }
